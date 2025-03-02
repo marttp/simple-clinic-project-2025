@@ -16,6 +16,10 @@ class AppointmentController(
     fun getAppointment(@PathVariable("id") id: Long): Appointment =
         appointmentService.getAppointmentById(id)
 
+    // Assume Input => 9AM - 5PM
+    // Date => always 00 seconds and hour round
+    // e.g. 2025-03-02T09:00:00, 2025-03-02T10:00:00, 2025-03-02T11:00:00
+    // UTC Timezone
     @PostMapping
     fun createAppointment(@RequestBody body: CreateAppointment): Appointment =
         appointmentService.createAppointment(body)
