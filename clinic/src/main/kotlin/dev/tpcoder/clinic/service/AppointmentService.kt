@@ -1,13 +1,30 @@
 package dev.tpcoder.clinic.service
 
+import dev.tpcoder.clinic.exception.DoctorUnavailableException
 import dev.tpcoder.clinic.model.Appointment
 import dev.tpcoder.clinic.model.DiagnosisInfo
 import dev.tpcoder.clinic.model.dto.CreateAppointment
+import dev.tpcoder.clinic.repository.AppointmentRepository
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
-class AppointmentService {
+class AppointmentService(
+    private val doctorService: DoctorService,
+    private val appointmentRepository: AppointmentRepository
+) {
+
+    private lateinit var localCacheDoctors: Set<Long>
+
+    init {
+        // Small Clinic => No-Cache or Local Cache
+        // Large/Multi-region Clinic => Distributed Cache option
+        // 0. Store doctor to cache
+        val doctors = doctorService.getDoctors()
+        localCacheDoctors = doctors.map { it.id }.toSet()
+    }
 
     fun getAppointmentById(id: Long): Appointment {
         // Data is in database
@@ -19,15 +36,31 @@ class AppointmentService {
         )
     }
 
+    // Assume => Clinic open every day
+    // Reservation => Assume Input => start of range => 1 hour
     fun createAppointment(body: CreateAppointment): Appointment {
-        // Find doctor and create appointment record
-        // 7 days
-        // Reservation => Assume Input => start of range => 1 hour
-        return Appointment(
-            id = 0L,
-            date = LocalDateTime.now(),
-            doctorId = 1L,
+        // 1. Get existing appointment in current time range
+        val startRange = body.date
+        val endRange = body.date.plusHours(1)
+        val appointmentInRange = appointmentRepository
+            .findAppointmentByTimeRange(startRange, endRange)
+        // 2. Filter doctor
+        val busyDoctors = appointmentInRange.map { it.doctorId }.toSet()
+        val availableDoctors = localCacheDoctors - busyDoctors
+        // If no one available => Bad Request
+        if (availableDoctors.isEmpty()) {
+            throw DoctorUnavailableException("Our doctors quite busy 😂")
+        }
+        // Same doctor cannot reserve on same time
+        val doctor = availableDoctors.random()
+        // 3. Store to DB
+        val prepareAppointment = Appointment(
+            date = body.date,
+            doctorId = doctor,
         )
+        val appointment = appointmentRepository.save(prepareAppointment)
+        logger.debug("Created appointment {}", appointment)
+        return appointment
     }
 
     fun updateAppointment(info: DiagnosisInfo): DiagnosisInfo {
@@ -41,5 +74,9 @@ class AppointmentService {
             information = "",
             medicinesRecommended = listOf()
         )
+    }
+
+    companion object {
+        val logger: Logger = LoggerFactory.getLogger(AppointmentService::class.java)
     }
 }
