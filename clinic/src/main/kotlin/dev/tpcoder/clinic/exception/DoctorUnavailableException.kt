@@ -1,3 +1,3 @@
 package dev.tpcoder.clinic.exception
 
-class DoctorUnavailableException(message: String) : RuntimeException(message)
+class DoctorUnavailableException(override val message: String) : RuntimeException(message)
