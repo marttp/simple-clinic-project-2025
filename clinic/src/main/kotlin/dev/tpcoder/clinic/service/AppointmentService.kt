@@ -1,14 +1,15 @@
 package dev.tpcoder.clinic.service
 
+import dev.tpcoder.clinic.exception.AppointmentNotFoundException
 import dev.tpcoder.clinic.exception.DoctorUnavailableException
 import dev.tpcoder.clinic.model.Appointment
 import dev.tpcoder.clinic.model.DiagnosisInfo
+import dev.tpcoder.clinic.model.dto.AppointmentInfoDto
 import dev.tpcoder.clinic.model.dto.CreateAppointment
 import dev.tpcoder.clinic.repository.AppointmentRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class AppointmentService(
@@ -26,13 +27,17 @@ class AppointmentService(
         localCacheDoctors = doctors.map { it.id }.toSet()
     }
 
-    fun getAppointmentById(id: Long): Appointment {
+    fun getAppointmentById(id: Long): AppointmentInfoDto {
         // Data is in database
         // If no => Error
-        return Appointment(
+        val existingAppointment = appointmentRepository.findById(id)
+            .orElseThrow { AppointmentNotFoundException("Appointment with id $id not found") }
+        val doctor = doctorService.getDoctorByDoctorId(existingAppointment.doctorId)
+            .orElseThrow { IllegalArgumentException("Doctor with id ${existingAppointment.doctorId} not found") }
+        return AppointmentInfoDto(
             id = id,
-            date = LocalDateTime.now(),
-            doctorId = 1L,
+            date = existingAppointment.date,
+            doctorName = "${doctor.firstName} ${doctor.lastName}",
         )
     }
 

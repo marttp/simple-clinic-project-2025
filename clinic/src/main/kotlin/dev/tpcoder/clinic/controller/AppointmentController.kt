@@ -2,6 +2,7 @@ package dev.tpcoder.clinic.controller
 
 import dev.tpcoder.clinic.model.Appointment
 import dev.tpcoder.clinic.model.DiagnosisInfo
+import dev.tpcoder.clinic.model.dto.AppointmentInfoDto
 import dev.tpcoder.clinic.model.dto.CreateAppointment
 import dev.tpcoder.clinic.service.AppointmentService
 import org.springframework.web.bind.annotation.*
@@ -13,7 +14,7 @@ class AppointmentController(
 ) {
 
     @GetMapping("/{id}")
-    fun getAppointment(@PathVariable("id") id: Long): Appointment =
+    fun getAppointment(@PathVariable("id") id: Long): AppointmentInfoDto =
         appointmentService.getAppointmentById(id)
 
     // Assume Input => 9AM - 5PM
