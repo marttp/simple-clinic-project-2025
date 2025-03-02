@@ -7,7 +7,7 @@ import dev.tpcoder.clinic.service.AppointmentService
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/v1/appointment")
+@RequestMapping("/v1/appointments")
 class AppointmentController(
     private val appointmentService: AppointmentService
 ) {

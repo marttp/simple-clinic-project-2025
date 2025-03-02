@@ -1,3 +1,7 @@
 spring:
   application:
     name: clinic
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/clinic_db
