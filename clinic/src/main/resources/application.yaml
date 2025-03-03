@@ -4,4 +4,8 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017/clinic_db
+      uri: ${DB_URL:mongodb://localhost:27017/clinic_db}
+
+external:
+  pharmacy:
+    url: ${PHARMACY_URL:http://localhost:8081}
