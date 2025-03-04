@@ -1,4 +1,4 @@
-package dev.tpcoder
+package dev.tpcoder.model
 
 import kotlinx.serialization.Serializable
 

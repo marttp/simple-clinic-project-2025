@@ -1,11 +1,9 @@
-package dev.tpcoder.clinic.model
+package dev.tpcoder.model
 
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Document
+import kotlinx.serialization.Serializable
 
-@Document
+@Serializable
 data class DiagnosisInfo(
-    @Id
     val appointmentId: Long,
     val patientFirstName: String,
     val patientLastName: String,

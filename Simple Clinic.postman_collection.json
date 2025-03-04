@@ -12,7 +12,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/v1/doctors",
+					"raw": "http://localhost:8080/v1/internal/doctors",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -20,6 +20,7 @@
 					"port": "8080",
 					"path": [
 						"v1",
+						"internal",
 						"doctors"
 					]
 				}
@@ -44,7 +45,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/v1/doctors",
+					"raw": "http://localhost:8080/v1/internal/doctors",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -52,6 +53,7 @@
 					"port": "8080",
 					"path": [
 						"v1",
+						"internal",
 						"doctors"
 					]
 				}
@@ -121,6 +123,85 @@
 						"v1",
 						"appointments",
 						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get list of medicine [Pharmacy]",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/v1/medicines",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"v1",
+						"medicines"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get list of medicine [Clinic]",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/internal/medicines",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"internal",
+						"medicines"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Complete diagnosis",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"appointmentId\": 1,\n    \"patientFirstName\": \"Harry\",\n    \"patientLastName\": \"Potter\",\n    \"information\": \"Headache\",\n    \"medicinesRecommended\": [\n        {\n            \"name\": \"Paracetamol\",\n            \"category\": \"Analgesic and Antipyretic\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/appointments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"appointments"
 					]
 				}
 			},
