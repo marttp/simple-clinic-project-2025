@@ -5,5 +5,14 @@ services:
       - '27017:27017'
     volumes:
       - clinicdata:/data/db
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: rabbitmq
+    ports:
+      - '5672:5672' # AMQP
+      - '15672:15672' # Management
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 volumes:
   clinicdata:
+  rabbitmq_data:

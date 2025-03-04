@@ -1,5 +1,7 @@
 package dev.tpcoder.clinic.service
 
+import dev.tpcoder.clinic.config.RabbitMqConfig.Companion.DIAGNOSIS_BINDING_NAME
+import dev.tpcoder.clinic.config.RabbitMqConfig.Companion.DIAGNOSIS_EXCHANGE_NAME
 import dev.tpcoder.clinic.exception.AppointmentNotFoundException
 import dev.tpcoder.clinic.exception.DoctorUnavailableException
 import dev.tpcoder.clinic.model.Appointment
@@ -7,14 +9,18 @@ import dev.tpcoder.clinic.model.DiagnosisInfo
 import dev.tpcoder.clinic.model.dto.AppointmentInfoDto
 import dev.tpcoder.clinic.model.dto.CreateAppointment
 import dev.tpcoder.clinic.repository.AppointmentRepository
+import dev.tpcoder.clinic.repository.DiagnosisInfoRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Service
 
 @Service
 class AppointmentService(
     private val doctorService: DoctorService,
-    private val appointmentRepository: AppointmentRepository
+    private val appointmentRepository: AppointmentRepository,
+    private val diagnosisInfoRepository: DiagnosisInfoRepository,
+    private val rabbitTemplate: RabbitTemplate
 ) {
 
     private lateinit var localCacheDoctors: Set<Long>
@@ -70,15 +76,14 @@ class AppointmentService(
 
     fun updateAppointment(info: DiagnosisInfo): DiagnosisInfo {
         // Just insert record on database
+        val result = diagnosisInfoRepository.save(info)
         // Send message to Pharmacy
-        return DiagnosisInfo(
-            appointmentId = 0L,
-            doctorId = 0L,
-            patientFirstName = "patientFirstName",
-            patientLastName = "patientLastName",
-            information = "",
-            medicinesRecommended = listOf()
+        rabbitTemplate.convertAndSend(
+            DIAGNOSIS_EXCHANGE_NAME,
+            DIAGNOSIS_BINDING_NAME,
+            result
         )
+        return result
     }
 
     companion object {
